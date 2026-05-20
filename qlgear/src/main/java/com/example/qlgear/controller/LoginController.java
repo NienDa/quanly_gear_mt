@@ -19,6 +19,7 @@ public class LoginController {
     public String login(){
         return "login";
     }
+    //logic login
     @PostMapping("/login")
     public String login(@RequestParam String username,
                         @RequestParam String password,
@@ -27,7 +28,11 @@ public class LoginController {
         if(user!=null){
             session.setAttribute("user",user);
             session.setAttribute("role",user.getRole());
-            return "redirect:/home";
+            if ("ADMIN".equals(user.getRole()) || "STAFF".equals(user.getRole())) {
+                return "redirect:/home";
+            } else {
+                return "redirect:/";
+            }
         }
         return "redirect:/login";
     }

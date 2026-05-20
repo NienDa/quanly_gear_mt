@@ -6,6 +6,7 @@ import com.example.qlgear.repository.CategoryRepository;
 import com.example.qlgear.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,6 +62,14 @@ public class ProductService {
         Product product = getProductById(id);
 
         repo.delete(product);
+    }
+    //tìm kiếm bằng name
+    public List<Product> find_NameSP(String name){
+        return repo.findByProductNameContainingIgnoreCase(name);
+    }
+    //lọc theo category
+    public List<Product> find_byCate(Long id){
+        return repo.findByCategoryId(id);
     }
 
 }

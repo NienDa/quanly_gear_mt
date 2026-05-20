@@ -9,10 +9,8 @@ import com.example.qlgear.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ProductController {
@@ -84,20 +82,35 @@ public class ProductController {
     //buy pd
     @GetMapping("/buy/{id}")
     public String buy(
-
             @PathVariable Long id,
-
-            HttpSession session
-
-    ) {
-        User user =
-                (User) session.getAttribute("user");
+            HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
         Product product = service.getProductById(id);
-
-        serviceOrder.buy_SP(
-                user,
-                product
+        serviceOrder.buy_SP(user, product);
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Đã xác nhận mua thành công: " + product.getProductName()
         );
-        return "redirect:/products";
+        return "redirect:/";
+    }
+    //tim kiem bằng tên
+    @GetMapping("/find")
+    public String findName(@RequestParam("name") String name,Model model){
+        model.addAttribute("products",service.find_NameSP(name));
+        model.addAttribute("categories",serviceCate.getAllCategory());
+        return "kh_home";
+    }
+    @GetMapping("/shop/category")
+    public String filterCategory(@RequestParam(name = "id", required = false) Long id, Model model) {
+        if (id == null) {
+            model.addAttribute("products", service.getAllProducts());
+        } else {
+            model.addAttribute("products", service.find_byCate(id));
+        }
+        model.addAttribute("categories", serviceCate.getAllCategory());
+        return "kh_home";
     }
 }
